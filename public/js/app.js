@@ -1852,12 +1852,41 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  // the passed user id
+  props: ['userId', 'follows'],
   mounted: function mounted() {
     console.log('Component mounted.');
   },
+  // set the statuses of the button, whether the authenticated user attached / unattached to the visted profile
+  data: function data() {
+    return {
+      status: this.follows
+    };
+  },
   methods: {
     followUser: function followUser() {
-      alert('inside');
+      var _this = this;
+
+      // create the route
+      axios.post('/follow/' + this.userId) // this is when we receive a success reponse
+      .then(function (response) {
+        // toggle status when we receive a success response
+        _this.status = !_this.status;
+        console.log(response.data);
+      }) // this is when we receive errors
+      ["catch"](function (errors) {
+        // 401 error raise when non logged in guest press the follow button when we restrict non auth user for using this button
+        if (errors.response.status = 401) {
+          // redirect to the login page
+          window.location = '/login';
+        }
+      });
+    }
+  },
+  // change the button text
+  computed: {
+    buttonText: function buttonText() {
+      return this.status ? 'Unfollow' : 'follow';
     }
   }
 });
@@ -37417,11 +37446,11 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _c(
-      "button",
-      { staticClass: "btn btn-primary ml-4", on: { click: _vm.followUser } },
-      [_vm._v("Follow")]
-    )
+    _c("button", {
+      staticClass: "btn btn-primary ml-4",
+      domProps: { textContent: _vm._s(_vm.buttonText) },
+      on: { click: _vm.followUser }
+    })
   ])
 }
 var staticRenderFns = []

@@ -10,7 +10,17 @@ class ProfilesController extends Controller
 {
     public function index(User $user)
     {
-        return view('profiles.index', compact('user'));
+        // if user is authenticated
+        if (auth()->user()){
+            // set to true if the auth user following the passed user's profile
+            $follows = auth()->user()->following->contains($user->id);
+        }else{
+            $follows = false;
+        }
+        
+        // dd($follows);
+
+        return view('profiles.index', compact('user', 'follows'));
     }
 
     public function edit(User $user)
